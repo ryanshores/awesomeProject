@@ -1,5 +1,6 @@
 import { useCart } from '../hooks/useCart';
 import type { Product } from '../types';
+import { Button } from './ui/Button';
 
 export function AddToCartButton({ product }: { product: Product }) {
   const { addToCart, loading } = useCart();
@@ -8,13 +9,17 @@ export function AddToCartButton({ product }: { product: Product }) {
     addToCart(product.id, 1);
   };
 
+  if (product.stock === 0) {
+    return (
+      <button disabled className="btn bg-gray-100 text-gray-400 cursor-not-allowed w-full">
+        Out of Stock
+      </button>
+    );
+  }
+
   return (
-    <button
-      onClick={handleAdd}
-      disabled={loading || product.stock === 0}
-      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-    >
-      {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-    </button>
+    <Button onClick={handleAdd} loading={loading} className="w-full">
+      Add to Cart
+    </Button>
   );
 }
