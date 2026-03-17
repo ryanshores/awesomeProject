@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"awesomeProject/config"
 	"awesomeProject/internal/models"
+	"awesomeProject/internal/services"
+	"context"
 	"net/http"
 	"strconv"
 
@@ -10,11 +13,15 @@ import (
 )
 
 type ProductHandler struct {
-	db *gorm.DB
+	db        *gorm.DB
+	stripeSvc *services.StripeProductService
 }
 
-func NewProductHandler(db *gorm.DB) *ProductHandler {
-	return &ProductHandler{db: db}
+func NewProductHandler(db *gorm.DB, cfg *config.Config) *ProductHandler {
+	return &ProductHandler{
+		db:        db,
+		stripeSvc: services.NewStripeProductService(cfg),
+	}
 }
 
 func (h *ProductHandler) List(c *gin.Context) {
@@ -84,6 +91,11 @@ func (h *ProductHandler) Create(c *gin.Context) {
 		IsActive:    true,
 	}
 
+	if err := h.stripeSvc.SyncProductToStripe(context.Background(), &product); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sync product with Stripe"})
+		return
+	}
+
 	if err := h.db.Create(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
 		return
@@ -113,6 +125,13 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	product.Stock = req.Stock
 	product.Category = req.Category
 	product.SKU = req.SKU
+
+	if product.StripeProductID == "" {
+		if err := h.stripeSvc.SyncProductToStripe(context.Background(), &product); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sync product with Stripe"})
+			return
+		}
+	}
 
 	if err := h.db.Save(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})

@@ -69,7 +69,7 @@ func setupRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 	}))
 
 	authHandler := handlers.NewAuthHandler(db, cfg)
-	productHandler := handlers.NewProductHandler(db)
+	productHandler := handlers.NewProductHandler(db, cfg)
 	subscriptionHandler := handlers.NewSubscriptionHandler(db)
 	cartHandler := handlers.NewCartHandler(db)
 	checkoutHandler := handlers.NewCheckoutHandler(db, cfg)

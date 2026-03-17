@@ -9,6 +9,7 @@ import (
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/checkout/session"
 	"github.com/stripe/stripe-go/v81/customer"
+	"github.com/stripe/stripe-go/v81/paymentintent"
 	"github.com/stripe/stripe-go/v81/price"
 	"github.com/stripe/stripe-go/v81/product"
 	"github.com/stripe/stripe-go/v81/subscription"
@@ -118,6 +119,12 @@ func (s *StripeService) GetCheckoutSession(sessionID string) (*stripe.CheckoutSe
 }
 
 func ConvertProductToLineItem(p *models.Product, quantity int64) *stripe.CheckoutSessionLineItemParams {
+	if p.StripePriceID != "" {
+		return &stripe.CheckoutSessionLineItemParams{
+			Price:    stripe.String(p.StripePriceID),
+			Quantity: stripe.Int64(quantity),
+		}
+	}
 	return &stripe.CheckoutSessionLineItemParams{
 		PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 			Currency:   stripe.String(string(stripe.CurrencyUSD)),
@@ -182,4 +189,17 @@ func (s *StripeProductService) SyncPlanToStripe(ctx context.Context, plan *model
 		plan.StripePriceID = stripePrice.ID
 	}
 	return nil
+}
+
+func (s *StripeService) ListPaymentIntents(customerID string) ([]*stripe.PaymentIntent, error) {
+	params := &stripe.PaymentIntentListParams{}
+	if customerID != "" {
+		params.Customer = stripe.String(customerID)
+	}
+	var paymentIntents []*stripe.PaymentIntent
+	iter := paymentintent.List(params)
+	for iter.Next() {
+		paymentIntents = append(paymentIntents, iter.PaymentIntent())
+	}
+	return paymentIntents, iter.Err()
 }

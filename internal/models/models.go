@@ -19,9 +19,10 @@ type User struct {
 	IsAdmin   bool           `json:"is_admin" gorm:"default:false"`
 	IsActive  bool           `json:"is_active" gorm:"default:true"`
 
-	Orders        []Order        `json:"orders,omitempty"`
-	Subscriptions []Subscription `json:"subscriptions,omitempty"`
-	CartItems     []CartItem     `json:"cart_items,omitempty"`
+	Orders           []Order        `json:"orders,omitempty"`
+	Subscriptions    []Subscription `json:"subscriptions,omitempty"`
+	CartItems        []CartItem     `json:"cart_items,omitempty"`
+	StripeCustomerID string         `json:"-"`
 }
 
 type Product struct {

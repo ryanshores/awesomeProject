@@ -116,7 +116,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 func (h *AuthHandler) Me(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	var user models.User
-	if err := h.db.First(&user, userID).Error; err != nil {
+	if err := h.db.Preload("Orders.OrderItems.Product").First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
