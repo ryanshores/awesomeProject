@@ -53,6 +53,7 @@ export interface Order {
   status: string;
   total: number;
   created_at: string;
+  user?: User;
   order_items: OrderItem[];
 }
 

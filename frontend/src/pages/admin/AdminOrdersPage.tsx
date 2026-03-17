@@ -1,72 +1,181 @@
 import { useEffect, useState } from 'react';
-import { getUsers, updateUser } from '../../api/admin';
-import type { User } from '../../types';
+import { getOrders, getOrder } from '../../api/admin';
+import type { Order } from '../../types';
+import { AdminLayout, PageHeader } from '../../components/layout/AdminLayout';
+import { Badge, Spinner, Modal } from '../../components/ui';
 
-export function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+export function AdminOrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const limit = 20;
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const data = await getOrders(page, limit);
+      setOrders(data.orders || []);
+      setTotal(data.total);
+    } catch {
+      console.error('Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getUsers(1, 100).then((data) => {
-      setUsers(data.users);
-      setLoading(false);
-    });
-  }, []);
+    fetchOrders();
+  }, [page]);
 
-  const toggleAdmin = async (user: User) => {
-    await updateUser(user.id, { is_admin: !user.is_admin });
-    setUsers(users.map((u) => (u.id === user.id ? { ...u, is_admin: !u.is_admin } : u)));
+  const viewOrder = async (orderId: number) => {
+    try {
+      const order = await getOrder(orderId);
+      setSelectedOrder(order);
+      setModalOpen(true);
+    } catch {
+      console.error('Failed to fetch order details');
+    }
   };
 
-  const toggleActive = async (user: User) => {
-    await updateUser(user.id, { is_active: !user.is_active });
-    setUsers(users.map((u) => (u.id === user.id ? { ...u, is_active: !u.is_active } : u)));
-  };
+  const totalPages = Math.ceil(total / limit);
 
-  if (loading) return <div className="p-8">Loading...</div>;
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <Badge variant="success">{status}</Badge>;
+      case 'pending':
+        return <Badge variant="warning">{status}</Badge>;
+      case 'cancelled':
+      case 'canceled':
+        return <Badge variant="danger">{status}</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Users</h1>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold">Email</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold">Name</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold">Admin</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold">Active</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4">{user.email}</td>
-                <td className="px-6 py-4">{user.first_name} {user.last_name}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded text-xs ${user.is_admin ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
-                    {user.is_admin ? 'Yes' : 'No'}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded text-xs ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {user.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 space-x-2">
-                  <button onClick={() => toggleAdmin(user)} className="text-blue-600 hover:text-blue-800">
-                    Toggle Admin
-                  </button>
-                  <button onClick={() => toggleActive(user)} className="text-red-600 hover:text-red-800">
-                    Toggle Active
-                  </button>
-                </td>
+    <AdminLayout>
+      <PageHeader title="Orders" description="View and manage customer orders" />
+      
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <Spinner size="lg" />
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-lg bg-white shadow">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Customer</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Date</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {orders.map((order) => (
+                <tr key={order.id} className="hover:bg-gray-50">
+                  <td className="whitespace-nowrap px-6 py-4">#{order.id}</td>
+                  <td className="whitespace-nowrap px-6 py-4">{order.user?.email || 'Unknown'}</td>
+                  <td className="whitespace-nowrap px-6 py-4">{statusBadge(order.status)}</td>
+                  <td className="whitespace-nowrap px-6 py-4">${(order.total / 100).toFixed(2)}</td>
+                  <td className="whitespace-nowrap px-6 py-4">{new Date(order.created_at).toLocaleDateString()}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right">
+                    <button
+                      onClick={() => viewOrder(order.id)}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    No orders found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t px-4 py-3">
+              <div className="text-sm text-gray-500">
+                Showing page {page} of {totalPages}
+              </div>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                  className="rounded-lg px-3 py-1 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages}
+                  className="rounded-lg px-3 py-1 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Order Details" size="lg">
+        {selectedOrder ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Order ID</p>
+                <p className="font-medium">#{selectedOrder.id}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                {statusBadge(selectedOrder.status)}
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Customer</p>
+                <p className="font-medium">{selectedOrder.user?.email}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Date</p>
+                <p className="font-medium">{new Date(selectedOrder.created_at).toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="border-t pt-4">
+              <h4 className="font-medium mb-2">Items</h4>
+              <div className="space-y-2">
+                {selectedOrder.order_items?.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span>
+                      {item.product?.name || 'Unknown Product'} × {item.quantity}
+                    </span>
+                    <span>${((item.price * item.quantity) / 100).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between font-medium mt-4 pt-2 border-t">
+                <span>Total</span>
+                <span>${(selectedOrder.total / 100).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
+        )}
+      </Modal>
+    </AdminLayout>
   );
 }

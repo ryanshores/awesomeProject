@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { CartProvider } from './hooks/useCart';
+import { ToastProvider } from './components/ui/Toast';
 import { Navbar } from './components/Navbar';
+import { PageLoader } from './components/ui/Spinner';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { ProductListPage } from './pages/shop/ProductListPage';
@@ -11,18 +13,19 @@ import { CartPage } from './pages/cart/CartPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
-import { AdminUsersPage } from './pages/admin/AdminOrdersPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminSubscriptionPlansPage } from './pages/admin/AdminSubscriptionPlansPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-  if (isLoading) return <div className="p-8">Loading...</div>;
+  if (isLoading) return <PageLoader />;
   return user ? <>{children}</> : <Navigate to="/login" />;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-  if (isLoading) return <div className="p-8">Loading...</div>;
+  if (isLoading) return <PageLoader />;
   return user?.is_admin ? <>{children}</> : <Navigate to="/" />;
 }
 
@@ -76,6 +79,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/admin/orders"
+        element={
+          <AdminRoute>
+            <AdminOrdersPage />
+          </AdminRoute>
+        }
+      />
+      <Route
         path="/admin/subscriptions"
         element={
           <AdminRoute>
@@ -92,10 +103,12 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <CartProvider>
-          <Navbar />
-          <main className="min-h-screen bg-gray-50">
-            <AppRoutes />
-          </main>
+          <ToastProvider>
+            <Navbar />
+            <main className="min-h-screen bg-gray-50">
+              <AppRoutes />
+            </main>
+          </ToastProvider>
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>
