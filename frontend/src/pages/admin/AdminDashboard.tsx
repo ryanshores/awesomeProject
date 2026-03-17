@@ -64,7 +64,7 @@ export function AdminDashboard() {
                   + Create subscription plan
                 </Link>
                 <Link to="/admin/orders" className="block text-blue-600 hover:text-blue-800">
-                  View recent orders
+                  - View recent orders
                 </Link>
               </div>
             </div>
