@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Configuration
+*.config.js
+tailwind.config.js
+postcss.config.js
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test files
+src/**/*.test.ts
+src/**/*.test.tsx
+src/**/*.spec.ts
+src/**/*.spec.tsx
+
+# Development files
+.env.local
+.env.*.local

@@ -130,3 +130,53 @@ A Shopify-like e-commerce platform with product sales and subscription managemen
 ## License
 
 MIT
+
+## Docker Deployment
+
+### Quick Start
+
+1. Copy environment file:
+   ```bash
+   cp .env.docker.example .env
+   ```
+
+2. Edit `.env` with your Stripe keys and a secure JWT secret.
+
+3. Run with Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Access the application at `http://localhost`
+
+### Docker Commands
+
+```bash
+# Build and run in background
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes (reset database)
+docker-compose down -v
+```
+
+### Docker Services
+
+- **backend** (port 8080): Go API server
+- **frontend** (port 80): Nginx serving React app + reverse proxy to API
+- **postgres** (port 5432): PostgreSQL database with persistent volume
+
+### Development with Docker
+
+For local development, you can run just the database:
+
+```bash
+docker-compose up -d postgres
+```
+
+Then run backend and frontend locally as described above.
