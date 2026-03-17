@@ -36,11 +36,11 @@ export function CartPage() {
       {items.length === 0 ? (
         <div className="card mt-8">
           <div className="empty-state py-12">
-            <svg className="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h3 className="empty-state-title">Your cart is empty</h3>
-            <p className="empty-state-description">Start shopping to add items to your cart</p>
+            <h3 className="mt-4 text-lg font-medium text-gray-900">Your cart is empty</h3>
+            <p className="mt-1 text-sm text-gray-500">Start shopping to add items to your cart</p>
             <button onClick={() => navigate('/products')} className="btn btn-primary mt-4">
               Browse Products
             </button>
@@ -60,7 +60,7 @@ export function CartPage() {
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center text-gray-400">
-                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>

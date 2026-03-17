@@ -50,11 +50,11 @@ export function ProductListPage() {
 
       {products.length === 0 ? (
         <div className="empty-state">
-          <svg className="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
-          <h3 className="empty-state-title">No products found</h3>
-          <p className="empty-state-description">Check back later for new products</p>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">No products found</h3>
+          <p className="mt-1 text-sm text-gray-500">Check back later for new products</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -73,7 +73,7 @@ export function ProductListPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <svg className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
