@@ -33,12 +33,12 @@ export function RegisterPage() {
         <div className="card">
           <div className="card-body">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
-              <p className="mt-2 text-gray-600">Get started with your free account</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Create account</h1>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">Get started with your free account</p>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+              <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -81,9 +81,9 @@ export function RegisterPage() {
               </Button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-gray-600">
+            <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
-              <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <a href="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
                 Sign in
               </a>
             </p>

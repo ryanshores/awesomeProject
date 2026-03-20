@@ -22,7 +22,7 @@ export function ProductListPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto text-blue-600" />
-          <p className="mt-4 text-gray-500">Loading products...</p>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Loading products...</p>
         </div>
       </div>
     );
@@ -50,11 +50,11 @@ export function ProductListPage() {
 
       {products.length === 0 ? (
         <div className="empty-state">
-          <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">No products found</h3>
-          <p className="mt-1 text-sm text-gray-500">Check back later for new products</p>
+          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">No products found</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Check back later for new products</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -64,7 +64,7 @@ export function ProductListPage() {
               className="card group overflow-hidden hover:shadow-lg transition-shadow duration-200"
             >
               <Link to={`/products/${product.id}`} className="block">
-                <div className="aspect-square overflow-hidden bg-gray-100">
+                <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
@@ -72,7 +72,7 @@ export function ProductListPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                       <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -85,19 +85,19 @@ export function ProductListPage() {
                   <span className="badge badge-default mb-2">{product.category}</span>
                 )}
                 <Link to={`/products/${product.id}`}>
-                  <h2 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <h2 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors">
                     {product.name}
                   </h2>
                 </Link>
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{product.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{product.description}</p>
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                     ${(product.price / 100).toFixed(2)}
                   </span>
                   {product.stock > 0 ? (
-                    <span className="text-xs text-green-600 font-medium">In Stock</span>
+                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">In Stock</span>
                   ) : (
-                    <span className="text-xs text-red-600 font-medium">Out of Stock</span>
+                    <span className="text-xs text-red-600 dark:text-red-400 font-medium">Out of Stock</span>
                   )}
                 </div>
                 <div className="mt-3">
