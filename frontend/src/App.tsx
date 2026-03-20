@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { CartProvider } from './hooks/useCart';
+import { ThemeProvider } from './hooks/useTheme';
 import { ToastProvider } from './components/ui/Toast';
 import { Navbar } from './components/Navbar';
 import { PageLoader } from './components/ui/Spinner';
@@ -101,16 +102,18 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <ToastProvider>
-            <Navbar />
-            <main className="min-h-screen bg-gray-50">
-              <AppRoutes />
-            </main>
-          </ToastProvider>
-        </CartProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>
+              <Navbar />
+              <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <AppRoutes />
+              </main>
+            </ToastProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

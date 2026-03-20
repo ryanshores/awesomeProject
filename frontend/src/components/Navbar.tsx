@@ -2,15 +2,45 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
+import { useTheme } from '../hooks/useTheme';
+
+function ThemeIcon({ theme, resolvedTheme }: { theme: string; resolvedTheme: string }) {
+  if (theme === 'system') {
+    return (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    );
+  }
+  if (resolvedTheme === 'dark') {
+    return (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  );
+}
 
 export function Navbar() {
   const { user, logout } = useAuth();
   const { items } = useCart();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const cycleTheme = () => {
+    const themes: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
+    const currentIndex = themes.indexOf(theme);
+    setTheme(themes[(currentIndex + 1) % themes.length]);
+  };
 
   const navLinks = [
     { path: '/products', label: 'Products' },
@@ -18,7 +48,7 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-soft border-b border-gray-100">
+    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-soft border-b border-gray-100 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -35,8 +65,8 @@ export function Navbar() {
                   to={link.path}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(link.path)
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   {link.label}
@@ -47,8 +77,8 @@ export function Navbar() {
                   to="/admin"
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     location.pathname.startsWith('/admin')
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   Admin
@@ -58,11 +88,18 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-3">
+            <button
+              onClick={cycleTheme}
+              className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title={`Theme: ${theme}${theme === 'system' ? ` (${resolvedTheme})` : ''}`}
+            >
+              <ThemeIcon theme={theme} resolvedTheme={resolvedTheme} />
+            </button>
             {user ? (
               <>
                 <Link
                   to="/cart"
-                  className="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  className="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -75,7 +112,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   to="/dashboard"
-                  className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -83,7 +120,7 @@ export function Navbar() {
                 </Link>
                 <button
                   onClick={logout}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                 >
                   Logout
                 </button>
@@ -92,7 +129,7 @@ export function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                 >
                   Login
                 </Link>
@@ -108,7 +145,7 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {mobileMenuOpen ? (
@@ -122,7 +159,7 @@ export function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-100 animate-slide-down">
+        <div className="md:hidden border-t border-gray-100 dark:border-gray-700 animate-slide-down">
           <div className="px-4 py-3 space-y-1">
             {navLinks.map((link) => (
               <Link
@@ -131,8 +168,8 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block px-4 py-2 rounded-lg text-base font-medium ${
                   isActive(link.path)
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {link.label}
@@ -144,8 +181,8 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block px-4 py-2 rounded-lg text-base font-medium ${
                   location.pathname.startsWith('/admin')
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 Admin
@@ -153,13 +190,23 @@ export function Navbar() {
             )}
           </div>
           
-          <div className="px-4 py-3 border-t border-gray-100 space-y-2">
+          <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700 space-y-2">
+            <button
+              onClick={() => {
+                cycleTheme();
+                setMobileMenuOpen(false);
+              }}
+              className="flex w-full items-center justify-between px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              <span>Theme: {theme}{theme === 'system' ? ` (${resolvedTheme})` : ''}</span>
+              <ThemeIcon theme={theme} resolvedTheme={resolvedTheme} />
+            </button>
             {user ? (
               <>
                 <Link
                   to="/cart"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                  className="flex items-center justify-between px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   <span>Cart</span>
                   {cartCount > 0 && (
@@ -171,7 +218,7 @@ export function Navbar() {
                 <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                  className="block px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Dashboard
                 </Link>
@@ -180,7 +227,7 @@ export function Navbar() {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                  className="block w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Logout
                 </button>
@@ -190,7 +237,7 @@ export function Navbar() {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                  className="block px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Login
                 </Link>
